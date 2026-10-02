@@ -25,11 +25,9 @@ htmlcov/
 # Data & Large Datasets (Tracked via DVC / Cloud Storage, NEVER git)
 data/raw/*
 !data/raw/.gitkeep
-data/processed/*
-!data/processed/.gitkeep
 
 # Large Model Weights & Checkpoints (Exceeds GitHub 100MB limit)
-# Note: Lightweight production baseline & vector index (<2MB) are tracked for zero-setup deployment
+# Note: Lightweight models (<2MB) and processed datasets (<1MB) are versioned for instant deployment
 *.bin
 *.onnx
 *.safetensors

@@ -13,3 +13,4 @@ target-version = "py311"
 # Core lint rules: E (pycodestyle errors), F (Pyflakes), W (pycodestyle warnings)
 select = ["E", "F", "W"]
 ignore = ["E501"]
+

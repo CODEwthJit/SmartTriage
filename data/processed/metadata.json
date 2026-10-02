@@ -1,0 +1,25 @@
+{
+  "dataset_name": "SmartTriage-Raw-Issues",
+  "total_samples": 1500,
+  "split_counts": {
+    "train": 1050,
+    "val": 225,
+    "test": 225
+  },
+  "category_to_id": {
+    "bug": 0,
+    "documentation": 1,
+    "feature": 2,
+    "performance": 3,
+    "security": 4
+  },
+  "priority_to_id": {
+    "P0-Critical": 0,
+    "P1-High": 1,
+    "P2-Medium": 2,
+    "P3-Low": 3
+  },
+  "avg_token_count": 21.93,
+  "max_token_count": 31,
+  "min_token_count": 15
+}
