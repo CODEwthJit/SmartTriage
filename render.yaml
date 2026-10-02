@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: smarttriage-api
+    runtime: docker
+    dockerfilePath: Dockerfile
+    dockerContext: .
+    plan: free
+    region: oregon
+    healthCheckPath: /v1/health
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHONUNBUFFERED
+        value: "1"
+

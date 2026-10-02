@@ -19,11 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pinned Python dependencies with CPU-optimized PyTorch
+# Install pinned Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && \
-    pip install --no-cache-dir -r requirements.txt && \
-    python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('all-MiniLM-L6-v2')"
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source code and serialized model registry
 COPY src/ /app/src/

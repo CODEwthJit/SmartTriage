@@ -1,3 +1,14 @@
+---
+title: SmartTriage AI Engine
+emoji: 🤖
+colorFrom: indigo
+colorTo: blue
+sdk: streamlit
+app_file: ui/app.py
+pinned: false
+license: mit
+---
+
 # SmartTriage: Production AI/ML Issue Routing & Real-Time Semantic Deduplication Engine
 
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
@@ -165,13 +176,24 @@ python src/monitoring/drift.py
 
 ## 🌐 Zero-Cost Cloud Deployment Guide
 
-### Deploying on Render (Free Tier)
-1. Push repository to GitHub.
-2. Log into [Render.com](https://render.com) and click **New +** $\to$ **Web Service**.
-3. Select your repository.
-4. Set Environment to **Docker** (Render automatically detects `Dockerfile`).
-5. Set Plan to **Free** ($512\text{ MB}$ RAM, $0.1\text{ CPU}$).
-6. Click **Deploy Web Service**. Your live API endpoint will be ready in 2 minutes.
+SmartTriage is architected for zero-friction deployment across multiple free cloud environments:
+
+### Option 1: Streamlit Community Cloud (Recommended for Web UI)
+1. Navigate to [share.streamlit.io](https://share.streamlit.io) and log in with GitHub.
+2. Click **New app** $\to$ select repository `CODEwthJit/SmartTriage`.
+3. Set **Main file path** to `ui/app.py`.
+4. Click **Deploy!** Your interactive dashboard will be live with a shareable URL (e.g. `https://smarttriage.streamlit.app`).
+
+### Option 2: Hugging Face Spaces (16 GB Free RAM)
+1. Go to [Hugging Face Spaces](https://huggingface.co/spaces) and click **Create new Space**.
+2. Name the space `SmartTriage` and select **Streamlit** SDK.
+3. Link your GitHub repository `CODEwthJit/SmartTriage` or clone the repo.
+4. HF Spaces automatically reads the `README.md` frontmatter and provisions the application with 16GB free RAM.
+
+### Option 3: Render Web Service (FastAPI REST API)
+1. Log into [Render.com](https://render.com) and click **New +** $\to$ **Blueprint**.
+2. Select your repository `CODEwthJit/SmartTriage`.
+3. Render automatically reads `render.yaml`, builds the multi-stage Docker container, verifies the `/v1/health` probe, and provides a public REST endpoint (e.g. `https://smarttriage-api.onrender.com/docs`).
 
 ---
 

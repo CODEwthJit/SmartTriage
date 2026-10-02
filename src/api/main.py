@@ -60,6 +60,11 @@ async def lifespan(app: FastAPI):
     search_engine.load(INDEX_PATH)
     app.state.search_engine = search_engine
 
+    # 3. Model Warm-Up pass (MLOps Latency Optimization)
+    print("Warming up inference pipeline to eliminate cold-start latency...")
+    app.state.classifier.predict_proba(["warmup query"])
+    app.state.search_engine.query(title="warmup", body="warmup", top_k=1)
+
     print("--- [STARTUP COMPLETE] SmartTriage API is Ready for Live Traffic ---")
     yield
     print("--- [SHUTDOWN] Unloading models and freeing memory ---")
