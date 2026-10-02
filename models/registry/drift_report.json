@@ -1,0 +1,28 @@
+{
+  "overall_status": "CRITICAL_DRIFT",
+  "sample_size": 3,
+  "length_drift": {
+    "ks_statistic": 1.0,
+    "p_value": 0.0,
+    "drift_detected": true
+  },
+  "vocabulary_drift": {
+    "oov_rate": 0.2593,
+    "unseen_token_count": 7,
+    "drift_detected": true
+  },
+  "class_distribution_comparison": {
+    "reference": {
+      "bug": 0.4486,
+      "feature": 0.2562,
+      "documentation": 0.1495,
+      "performance": 0.1,
+      "security": 0.0457
+    },
+    "current": {
+      "bug": 0.3333,
+      "feature": 0.3333,
+      "performance": 0.3333
+    }
+  }
+}

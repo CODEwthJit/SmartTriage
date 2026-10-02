@@ -48,6 +48,11 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
+      - name: Verify / Generate Model Artifacts
+        run: |
+          python src/models/baseline.py
+          python src/inference/vector_search.py
+
       - name: Run Pytest Integration Suite
         run: |
           pytest tests/integration/test_api.py -v --durations=10

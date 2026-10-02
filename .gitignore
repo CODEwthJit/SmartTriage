@@ -29,9 +29,7 @@ data/processed/*
 !data/processed/.gitkeep
 
 # Large Model Weights & Checkpoints (Exceeds GitHub 100MB limit)
-models/registry/*
-!models/registry/.gitkeep
-*.pt
+# Note: Lightweight production baseline & vector index (<2MB) are tracked for zero-setup deployment
 *.bin
 *.onnx
 *.safetensors
