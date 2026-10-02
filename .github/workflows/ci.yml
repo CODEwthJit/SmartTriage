@@ -1,0 +1,77 @@
+name: SmartTriage CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Job 1: Static Code Quality & Linting
+  lint:
+    name: Code Quality & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Ruff Linter
+        run: pip install ruff
+
+      - name: Run Ruff Lint Checks
+        run: ruff check .
+
+  # Job 2: Automated Pytest Integration & Latency Benchmarks
+  test:
+    name: Automated Tests & Latency Contracts
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Core Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Pytest Integration Suite
+        run: |
+          pytest tests/integration/test_api.py -v --durations=10
+
+  # Job 3: Docker Container Build & Container Smoke Test
+  docker-verify:
+    name: Docker Build & Healthcheck Smoke Test
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: actions/setup-buildx-action@v3
+
+      - name: Build SmartTriage Container Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: smarttriage:latest
+
+      - name: Run Container & Verify Health Probe
+        run: |
+          docker run -d --name smarttriage-test -p 8000:8000 smarttriage:latest
+          sleep 5
+          curl --fail --retry 5 --retry-delay 3 http://localhost:8000/v1/health
+          docker stop smarttriage-test

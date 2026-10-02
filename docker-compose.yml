@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  # Service 1: FastAPI Inference Gateway
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smarttriage-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/v1/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - smarttriage-network
+
+  # Service 2: Streamlit Interactive Web Client
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smarttriage-ui
+    command: ["streamlit", "run", "ui/app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000/v1/triage
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - smarttriage-network
+
+networks:
+  smarttriage-network:
+    driver: bridge

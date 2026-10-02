@@ -1,0 +1,43 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Testing & Linting
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# Environment Variables & Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# Data & Large Datasets (Tracked via DVC / Cloud Storage, NEVER git)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Large Model Weights & Checkpoints (Exceeds GitHub 100MB limit)
+models/registry/*
+!models/registry/.gitkeep
+*.pt
+*.bin
+*.onnx
+*.safetensors
+
+# OS & Editor Artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
