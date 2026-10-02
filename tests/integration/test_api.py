@@ -29,7 +29,7 @@ def test_triage_bug_issue(client):
     """Verifies triage endpoint correctly classifies a bug and detects NPE duplicate."""
     payload = {
         "title": "NullPointerException when cart checkout is empty",
-        "body": "Submitting checkout without items causes 500 error due to NPE in CheckoutService."
+        "body": "Submitting checkout without items causes 500 error due to NPE in CheckoutService.",
     }
     response = client.post("/v1/triage", json=payload)
     assert response.status_code == 200
@@ -45,7 +45,7 @@ def test_triage_security_issue(client):
     """Verifies triage endpoint correctly flags security vulnerability."""
     payload = {
         "title": "SQL injection vulnerability in user search filter",
-        "body": "User filter parameter is concatenated into raw SQL string."
+        "body": "User filter parameter is concatenated into raw SQL string.",
     }
     response = client.post("/v1/triage", json=payload)
     assert response.status_code == 200
@@ -59,4 +59,3 @@ def test_validation_error_on_short_title(client):
     payload = {"title": "ab"}
     response = client.post("/v1/triage", json=payload)
     assert response.status_code == 422
-

@@ -42,8 +42,10 @@ jobs:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install Core Dependencies
+      - name: Install CPU PyTorch & Dependencies
         run: |
+          pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -r requirements.txt
 
       - name: Run Pytest Integration Suite
@@ -72,6 +74,6 @@ jobs:
       - name: Run Container & Verify Health Probe
         run: |
           docker run -d --name smarttriage-test -p 8000:8000 smarttriage:latest
-          sleep 5
+          sleep 8
           curl --fail --retry 5 --retry-delay 3 http://localhost:8000/v1/health
           docker stop smarttriage-test

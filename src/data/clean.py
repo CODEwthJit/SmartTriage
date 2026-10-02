@@ -29,20 +29,20 @@ def normalize_text(text: str) -> str:
         return ""
 
     # 1. Convert markdown links [text](http...) to just 'text'
-    text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
+    text = re.sub(r"\[([^\]]+)\]\([^\)]+\)", r"\1", text)
 
     # 2. Replace raw URLs with a generic <URL> token to prevent overfitting to specific domains
-    text = re.sub(r'https?://\S+|www\.\S+', '<URL>', text)
+    text = re.sub(r"https?://\S+|www\.\S+", "<URL>", text)
 
     # 3. Strip backticks from inline code blocks while preserving the code tokens
-    text = re.sub(r'`([^`]+)`', r'\1', text)
+    text = re.sub(r"`([^`]+)`", r"\1", text)
 
     # 4. Remove triple-backtick markdown blocks entirely but keep their contents
-    text = re.sub(r'```[a-zA-Z]*\n?', '', text)
-    text = re.sub(r'```', '', text)
+    text = re.sub(r"```[a-zA-Z]*\n?", "", text)
+    text = re.sub(r"```", "", text)
 
     # 5. Normalize excessive whitespace, tabs, and newlines to a single space
-    text = re.sub(r'\s+', ' ', text).strip()
+    text = re.sub(r"\s+", " ", text).strip()
 
     return text
 
@@ -53,7 +53,7 @@ def clean_and_split_data(
     train_ratio: float = 0.70,
     val_ratio: float = 0.15,
     test_ratio: float = 0.15,
-    random_seed: int = 42
+    random_seed: int = 42,
 ) -> dict:
     """
     Loads raw issues, cleans text, performs stratified splitting on the target category,
@@ -82,20 +82,12 @@ def clean_and_split_data(
 
     # Stratified Split Phase 1: Separate Train (70%) from Temporary (30% for Val + Test)
     temp_ratio = val_ratio + test_ratio
-    train_df, temp_df = train_test_split(
-        df,
-        test_size=temp_ratio,
-        stratify=df["category"],
-        random_state=random_seed
-    )
+    train_df, temp_df = train_test_split(df, test_size=temp_ratio, stratify=df["category"], random_state=random_seed)
 
     # Stratified Split Phase 2: Split Temporary 50/50 into Validation (15%) and Test (15%)
     val_fraction_of_temp = val_ratio / temp_ratio
     val_df, test_df = train_test_split(
-        temp_df,
-        test_size=(1.0 - val_fraction_of_temp),
-        stratify=temp_df["category"],
-        random_state=random_seed
+        temp_df, test_size=(1.0 - val_fraction_of_temp), stratify=temp_df["category"], random_state=random_seed
     )
 
     # Reset indices
@@ -120,16 +112,12 @@ def clean_and_split_data(
     metadata = {
         "dataset_name": "SmartTriage-Raw-Issues",
         "total_samples": len(df),
-        "split_counts": {
-            "train": len(train_df),
-            "val": len(val_df),
-            "test": len(test_df)
-        },
+        "split_counts": {"train": len(train_df), "val": len(val_df), "test": len(test_df)},
         "category_to_id": {label: idx for idx, label in enumerate(category_labels)},
         "priority_to_id": {label: idx for idx, label in enumerate(priority_labels)},
         "avg_token_count": round(float(df["token_count"].mean()), 2),
         "max_token_count": int(df["token_count"].max()),
-        "min_token_count": int(df["token_count"].min())
+        "min_token_count": int(df["token_count"].min()),
     }
 
     with open(METADATA_FILE, "w", encoding="utf-8") as f:
@@ -144,7 +132,9 @@ def main():
     metadata = clean_and_split_data()
     print("\n--- PIPELINE EXECUTION COMPLETED ---")
     print(f"Total Rows Processed: {metadata['total_samples']}")
-    print(f"Splits -> Train: {metadata['split_counts']['train']}, Val: {metadata['split_counts']['val']}, Test: {metadata['split_counts']['test']}")
+    print(
+        f"Splits -> Train: {metadata['split_counts']['train']}, Val: {metadata['split_counts']['val']}, Test: {metadata['split_counts']['test']}"
+    )
     print(f"Target Categories: {list(metadata['category_to_id'].keys())}")
     print(f"Target Priorities: {list(metadata['priority_to_id'].keys())}")
     print(f"Average Issue Word Count: {metadata['avg_token_count']} words")

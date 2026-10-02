@@ -58,17 +58,17 @@ class DriftDetector:
             "length_drift": {
                 "ks_statistic": round(float(ks_stat), 4),
                 "p_value": round(float(ks_pvalue), 4),
-                "drift_detected": length_drift
+                "drift_detected": length_drift,
             },
             "vocabulary_drift": {
                 "oov_rate": round(float(oov_rate), 4),
                 "unseen_token_count": len(unseen_tokens),
-                "drift_detected": oov_drift
+                "drift_detected": oov_drift,
             },
             "class_distribution_comparison": {
                 "reference": {k: round(v, 4) for k, v in self.ref_class_dist.items()},
-                "current": {k: round(v, 4) for k, v in curr_dist.items()}
-            }
+                "current": {k: round(v, 4) for k, v in curr_dist.items()},
+            },
         }
 
         # Persist report
@@ -86,7 +86,7 @@ def main():
     normal_batch_texts = [
         "NullPointerException on cart checkout when user session expires",
         "Add support for export to CSV format on billing transactions",
-        "Slow SQL query in user notifications table taking over 3 seconds"
+        "Slow SQL query in user notifications table taking over 3 seconds",
     ]
     normal_batch_preds = ["bug", "feature", "performance"]
 

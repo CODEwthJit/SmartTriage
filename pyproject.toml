@@ -1,0 +1,15 @@
+[project]
+name = "smarttriage"
+version = "1.0.0"
+description = "Production AI/ML Issue Routing & Real-Time Semantic Deduplication Engine"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+# Core lint rules: E (pycodestyle errors), F (Pyflakes), W (pycodestyle warnings)
+select = ["E", "F", "W"]
+ignore = ["E501"]

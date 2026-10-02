@@ -16,7 +16,7 @@ class IssueRequest(BaseModel):
         "json_schema_extra": {
             "example": {
                 "title": "NullPointerException when cart checkout is empty",
-                "body": "When submitting checkout without items, server crashes with 500 NPE in CheckoutService."
+                "body": "When submitting checkout without items, server crashes with 500 NPE in CheckoutService.",
             }
         }
     }
@@ -58,4 +58,3 @@ class HealthResponse(BaseModel):
     classifier_loaded: bool
     vector_index_loaded: bool
     indexed_documents: int
-

@@ -22,8 +22,8 @@ class DuplicateSearchEngine:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         self.model_name = model_name
         self.encoder = SentenceTransformer(model_name)
-        self.embeddings = None          # Shape: (N, 384)
-        self.metadata = None            # List of issue dicts
+        self.embeddings = None  # Shape: (N, 384)
+        self.metadata = None  # List of issue dicts
 
     def build_index(self, data_file: Path = TRAIN_FILE) -> int:
         """Encodes all historical training issues and builds an L2-normalized vector matrix."""
@@ -31,9 +31,9 @@ class DuplicateSearchEngine:
         df = pd.read_csv(data_file)
 
         # Store searchable issue metadata
-        self.metadata = df[[
-            "issue_id", "title", "body", "category", "priority", "duplicate_group_id"
-        ]].to_dict(orient="records")
+        self.metadata = df[["issue_id", "title", "body", "category", "priority", "duplicate_group_id"]].to_dict(
+            orient="records"
+        )
 
         # Combine title and body for rich semantic representation
         texts = [f"{row['title']} {row['body']}" for row in self.metadata]
@@ -43,7 +43,7 @@ class DuplicateSearchEngine:
             texts,
             batch_size=64,
             show_progress_bar=True,
-            normalize_embeddings=True  # L2 normalization for instant cosine dot-products
+            normalize_embeddings=True,  # L2 normalization for instant cosine dot-products
         )
 
         self.embeddings = np.array(raw_embeddings, dtype=np.float32)
@@ -72,26 +72,24 @@ class DuplicateSearchEngine:
         for idx in top_indices:
             score = float(similarities[idx])
             issue = self.metadata[idx]
-            results.append({
-                "issue_id": int(issue["issue_id"]),
-                "title": issue["title"],
-                "category": issue["category"],
-                "priority": issue["priority"],
-                "similarity_score": round(score, 4),
-                "is_duplicate_warning": bool(score >= threshold),
-                "duplicate_group_id": int(issue["duplicate_group_id"])
-            })
+            results.append(
+                {
+                    "issue_id": int(issue["issue_id"]),
+                    "title": issue["title"],
+                    "category": issue["category"],
+                    "priority": issue["priority"],
+                    "similarity_score": round(score, 4),
+                    "is_duplicate_warning": bool(score >= threshold),
+                    "duplicate_group_id": int(issue["duplicate_group_id"]),
+                }
+            )
 
         return results
 
     def save(self, output_path: Path = INDEX_FILE):
         """Serializes precomputed embeddings and metadata for zero-overhead inference."""
         MODEL_REGISTRY_DIR.mkdir(parents=True, exist_ok=True)
-        payload = {
-            "model_name": self.model_name,
-            "embeddings": self.embeddings,
-            "metadata": self.metadata
-        }
+        payload = {"model_name": self.model_name, "embeddings": self.embeddings, "metadata": self.metadata}
         joblib.dump(payload, output_path)
         print(f"Saved vector index to: {output_path}")
 
@@ -112,18 +110,22 @@ def main():
     # Test Query 1: Variant of NPE checkout bug
     test_query_1 = "Cart checkout crashes with NullPointerException when basket is empty"
     print("\n--- Testing Semantic Search Query 1 ---")
-    print(f"Query: \"{test_query_1}\"")
+    print(f'Query: "{test_query_1}"')
     matches = engine.query(title=test_query_1, top_k=3, threshold=0.70)
     for i, m in enumerate(matches, 1):
-        print(f"  Top {i}: [{m['similarity_score']:.4f}] Issue #{m['issue_id']} - {m['title']} (Dup Warning: {m['is_duplicate_warning']})")
+        print(
+            f"  Top {i}: [{m['similarity_score']:.4f}] Issue #{m['issue_id']} - {m['title']} (Dup Warning: {m['is_duplicate_warning']})"
+        )
 
     # Test Query 2: Variant of SQL Injection security vulnerability
     test_query_2 = "SQL injection vulnerability discovered in search filter parameter"
     print("\n--- Testing Semantic Search Query 2 ---")
-    print(f"Query: \"{test_query_2}\"")
+    print(f'Query: "{test_query_2}"')
     matches = engine.query(title=test_query_2, top_k=3, threshold=0.70)
     for i, m in enumerate(matches, 1):
-        print(f"  Top {i}: [{m['similarity_score']:.4f}] Issue #{m['issue_id']} - {m['title']} (Dup Warning: {m['is_duplicate_warning']})")
+        print(
+            f"  Top {i}: [{m['similarity_score']:.4f}] Issue #{m['issue_id']} - {m['title']} (Dup Warning: {m['is_duplicate_warning']})"
+        )
 
 
 if __name__ == "__main__":

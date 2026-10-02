@@ -56,21 +56,22 @@ def train_and_evaluate_baselines():
     target_names = list(metadata["category_to_id"].keys())
 
     # Candidate 1: Multinomial Naive Bayes Pipeline
-    nb_pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=2500, ngram_range=(1, 2), stop_words="english", sublinear_tf=True)),
-        ("clf", MultinomialNB(alpha=1.0))
-    ])
+    nb_pipeline = Pipeline(
+        [
+            ("tfidf", TfidfVectorizer(max_features=2500, ngram_range=(1, 2), stop_words="english", sublinear_tf=True)),
+            ("clf", MultinomialNB(alpha=1.0)),
+        ]
+    )
 
     # Candidate 2: Balanced Multinomial Logistic Regression Pipeline
-    lr_pipeline = Pipeline([
-        ("tfidf", TfidfVectorizer(max_features=2500, ngram_range=(1, 2), stop_words="english", sublinear_tf=True)),
-        ("clf", LogisticRegression(max_iter=1000, class_weight="balanced", random_state=42))
-    ])
+    lr_pipeline = Pipeline(
+        [
+            ("tfidf", TfidfVectorizer(max_features=2500, ngram_range=(1, 2), stop_words="english", sublinear_tf=True)),
+            ("clf", LogisticRegression(max_iter=1000, class_weight="balanced", random_state=42)),
+        ]
+    )
 
-    candidates = {
-        "Multinomial_Naive_Bayes": nb_pipeline,
-        "Logistic_Regression_Balanced": lr_pipeline
-    }
+    candidates = {"Multinomial_Naive_Bayes": nb_pipeline, "Logistic_Regression_Balanced": lr_pipeline}
 
     results = {}
     best_model_name = None
@@ -111,7 +112,7 @@ def train_and_evaluate_baselines():
             "macro_f1": macro_f1,
             "weighted_f1": weighted_f1,
             "confusion_matrix": conf_matrix,
-            "classification_report": report
+            "classification_report": report,
         }
 
         # Track the model with the highest Macro-F1 score
@@ -132,7 +133,7 @@ def train_and_evaluate_baselines():
         "best_model": best_model_name,
         "best_macro_f1": best_macro_f1,
         "vocabulary_size": len(best_pipeline.named_steps["tfidf"].vocabulary_),
-        "benchmark_results": results
+        "benchmark_results": results,
     }
 
     with open(BASELINE_METRICS_FILE, "w", encoding="utf-8") as f:
@@ -148,4 +149,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

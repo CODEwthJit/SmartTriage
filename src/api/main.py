@@ -17,7 +17,7 @@ from src.api.schemas import (
     DuplicateMatch,
     DuplicateSearchRequest,
     DuplicateSearchResponse,
-    HealthResponse
+    HealthResponse,
 )
 from src.inference.vector_search import DuplicateSearchEngine
 
@@ -33,7 +33,7 @@ CATEGORY_PRIORITY_MAP = {
     "bug": "P1-High",
     "performance": "P1-High",
     "feature": "P2-Medium",
-    "documentation": "P3-Low"
+    "documentation": "P3-Low",
 }
 
 
@@ -69,7 +69,7 @@ app = FastAPI(
     title="SmartTriage API",
     version="1.0.0",
     description="Production AI/ML Service for Intelligent GitHub Issue Triage & Semantic Deduplication",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Enable CORS for frontend clients
@@ -93,7 +93,7 @@ async def health_check():
         status="healthy" if classifier_ready and engine_ready else "degraded",
         classifier_loaded=classifier_ready,
         vector_index_loaded=engine_ready,
-        indexed_documents=doc_count
+        indexed_documents=doc_count,
     )
 
 
@@ -120,12 +120,7 @@ async def triage_issue(request: IssueRequest):
             pred_priority = "P0-Critical"
 
         # Step 2: Semantic Duplicate Search (top 3 candidates)
-        raw_matches = app.state.search_engine.query(
-            title=request.title,
-            body=request.body,
-            top_k=3,
-            threshold=0.70
-        )
+        raw_matches = app.state.search_engine.query(title=request.title, body=request.body, top_k=3, threshold=0.70)
 
         duplicates = [DuplicateMatch(**m) for m in raw_matches]
         has_duplicate_warning = any(m.is_duplicate_warning for m in duplicates)
@@ -138,14 +133,11 @@ async def triage_issue(request: IssueRequest):
             confidence=round(confidence, 4),
             duplicate_warning=has_duplicate_warning,
             top_duplicates=duplicates,
-            latency_ms=latency_ms
+            latency_ms=latency_ms,
         )
 
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Inference error: {str(e)}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Inference error: {str(e)}")
 
 
 @app.post("/v1/duplicates", response_model=DuplicateSearchResponse, tags=["Inference"])
@@ -154,27 +146,19 @@ async def search_duplicates(request: DuplicateSearchRequest):
     start_time = time.perf_counter()
     try:
         raw_matches = app.state.search_engine.query(
-            title=request.title,
-            body=request.body,
-            top_k=request.top_k,
-            threshold=request.threshold
+            title=request.title, body=request.body, top_k=request.top_k, threshold=request.threshold
         )
         duplicates = [DuplicateMatch(**m) for m in raw_matches]
         latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
         return DuplicateSearchResponse(
-            query=f"{request.title} {request.body}".strip(),
-            matches=duplicates,
-            latency_ms=latency_ms
+            query=f"{request.title} {request.body}".strip(), matches=duplicates, latency_ms=latency_ms
         )
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Vector search error: {str(e)}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Vector search error: {str(e)}")
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("src.api.main:app", host="0.0.0.0", port=8000, reload=True)
 
+    uvicorn.run("src.api.main:app", host="0.0.0.0", port=8000, reload=True)

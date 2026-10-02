@@ -25,6 +25,7 @@ PYTORCH_VOCAB_FILE = MODEL_REGISTRY_DIR / "pytorch_vocab.json"
 
 class Vocabulary:
     """Maps tokens to unique integers, handling <PAD> and <UNK>."""
+
     def __init__(self, min_freq: int = 1):
         self.pad_token = "<PAD>"
         self.unk_token = "<UNK>"
@@ -54,6 +55,7 @@ class Vocabulary:
 
 class IssueDataset(Dataset):
     """PyTorch Dataset wrapping issue texts and category labels."""
+
     def __init__(self, texts: list[str], labels: list[int], vocab: Vocabulary):
         self.labels = labels
         self.encoded_texts = [vocab.numericalize(t) for t in texts]
@@ -74,7 +76,7 @@ def collate_fn(batch, pad_idx=0, max_len=64):
     padded = torch.full((batch_size, max_len), fill_value=pad_idx, dtype=torch.long)
     for i, seq in enumerate(sequences):
         seq = seq[:max_len]
-        padded[i, :len(seq)] = torch.tensor(seq, dtype=torch.long)
+        padded[i, : len(seq)] = torch.tensor(seq, dtype=torch.long)
 
     labels = torch.tensor(labels, dtype=torch.long)
     return padded, labels
@@ -86,6 +88,7 @@ class TextClassifierMLP(nn.Module):
     Input IDs (B, L) -> Embedding (B, L, D) -> Global Mean Pool (B, D)
     -> Linear (D, H) -> ReLU -> Dropout -> Linear (H, K) -> Logits
     """
+
     def __init__(self, vocab_size: int, embed_dim: int, hidden_dim: int, num_classes: int, pad_idx: int = 0):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=pad_idx)
@@ -148,11 +151,7 @@ def train_pytorch_model():
 
     # 5. Initialize Model, Loss, Optimizer
     model = TextClassifierMLP(
-        vocab_size=len(vocab),
-        embed_dim=64,
-        hidden_dim=32,
-        num_classes=num_classes,
-        pad_idx=0
+        vocab_size=len(vocab), embed_dim=64, hidden_dim=32, num_classes=num_classes, pad_idx=0
     ).to(device)
 
     # Calculate class weights for loss function to handle class imbalance
@@ -176,11 +175,11 @@ def train_pytorch_model():
         for texts, labels in train_loader:
             texts, labels = texts.to(device), labels.to(device)
 
-            optimizer.zero_grad()        # 1. Reset gradients
-            outputs = model(texts)       # 2. Forward pass
+            optimizer.zero_grad()  # 1. Reset gradients
+            outputs = model(texts)  # 2. Forward pass
             loss = criterion(outputs, labels)  # 3. Calculate loss
-            loss.backward()              # 4. Backward pass (Autograd)
-            optimizer.step()             # 5. Update weights
+            loss.backward()  # 4. Backward pass (Autograd)
+            optimizer.step()  # 5. Update weights
 
             total_loss += loss.item() * texts.size(0)
 
@@ -202,14 +201,17 @@ def train_pytorch_model():
 
         if val_f1 > best_val_f1:
             best_val_f1 = val_f1
-            torch.save({
-                "model_state_dict": model.state_dict(),
-                "vocab_size": len(vocab),
-                "embed_dim": 64,
-                "hidden_dim": 32,
-                "num_classes": num_classes,
-                "macro_f1": best_val_f1
-            }, PYTORCH_MODEL_FILE)
+            torch.save(
+                {
+                    "model_state_dict": model.state_dict(),
+                    "vocab_size": len(vocab),
+                    "embed_dim": 64,
+                    "hidden_dim": 32,
+                    "num_classes": num_classes,
+                    "macro_f1": best_val_f1,
+                },
+                PYTORCH_MODEL_FILE,
+            )
 
     print(f"\nModel training complete. Best Val Macro-F1: {best_val_f1:.4f}")
     print(f"Saved checkpoint to: {PYTORCH_MODEL_FILE}")
@@ -217,4 +219,3 @@ def train_pytorch_model():
 
 if __name__ == "__main__":
     train_pytorch_model()
-
