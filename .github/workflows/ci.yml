@@ -81,6 +81,6 @@ jobs:
       - name: Run Container & Verify Health Probe
         run: |
           docker run -d --name smarttriage-test -p 8000:8000 smarttriage:latest
-          sleep 5
-          curl --fail --retry 5 --retry-delay 3 http://localhost:8000/v1/health
+          sleep 10
+          curl --fail --retry 10 --retry-delay 3 --retry-all-errors http://localhost:8000/v1/health
           docker stop smarttriage-test
