@@ -20,6 +20,10 @@ st.set_page_config(
     layout="wide",
 )
 
+# Robust workspace root resolution (supports running from root or from ui/ directory)
+CURRENT_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = CURRENT_DIR if (CURRENT_DIR / "models").exists() else CURRENT_DIR.parent
+
 # Priority heuristic map
 CATEGORY_PRIORITY_MAP = {
     "security": "P0-Critical",
@@ -59,9 +63,8 @@ def load_local_engine():
     try:
         from src.inference.vector_search import DuplicateSearchEngine
 
-        root = Path(__file__).resolve().parent.parent
-        clf_path = root / "models" / "registry" / "baseline_pipeline.joblib"
-        idx_path = root / "models" / "registry" / "vector_index.joblib"
+        clf_path = PROJECT_ROOT / "models" / "registry" / "baseline_pipeline.joblib"
+        idx_path = PROJECT_ROOT / "models" / "registry" / "vector_index.joblib"
 
         if clf_path.exists() and idx_path.exists():
             clf = joblib.load(clf_path)
